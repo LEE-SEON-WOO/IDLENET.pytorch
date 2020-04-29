@@ -84,6 +84,7 @@ if __name__ == '__main__':
         blur_check = args.blur
 
         if blur_check:
+            blur_confidence = test.run_example(path_to_input_image)
             test.run_example(path_to_input_image)
 
         dataset_name = args.dataset
@@ -108,7 +109,6 @@ if __name__ == '__main__':
         print(Config.describe())
 
         _infer(path_to_input_image, path_to_output_image, path_to_checkpoint, dataset_name, backbone_name, prob_thresh)
-        analyze_csv.analyze(path_to_input_xml, path_to_input_csv, path_to_output_json)
+        analyze_csv.analyze(path_to_input_xml, path_to_input_csv, path_to_output_json, blur_confidence)
 
-    #   
     main()
