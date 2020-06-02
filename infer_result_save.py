@@ -11,7 +11,6 @@ from model import Model
 from roi.pooler import Pooler
 from config.eval_config import EvalConfig as Config
 import analyze_csv
-from blur import blur
 
 def _infer(path_to_input_image: str, path_to_output_image: str, path_to_checkpoint: str, dataset_name: str, backbone_name: str, prob_thresh: float):
     dataset_class = DatasetBase.from_name(dataset_name)
@@ -79,17 +78,17 @@ if __name__ == '__main__':
         root_dir = os.path.dirname(os.path.realpath(__file__))
         # path_dir = os.path.join(root_dir + args.data_path)
         path_dir = os.path.abspath(args.img_input)
-        image_path = os.path.join(path_dir,'color')
+        image_path = path_dir
         image_path_list = [f for f in os.listdir(image_path) if f.endswith(".jpg")]
         print(f"find {len(image_path_list)} images")
 
         path_dir = os.path.abspath(args.csv_input)
-        csv_path = os.path.join(path_dir,'csv')
+        csv_path = path_dir
         csv_path_list = [f for f in os.listdir(csv_path) if f.endswith(".csv")]
         print(f"find {len(csv_path_list)} Csvs")
 
         path_dir = os.path.abspath(args.xml_input)
-        xml_path = os.path.join(path_dir,'annotation')
+        xml_path = path_dir
         xml_path_list = [f for f in os.listdir(xml_path) if f.endswith(".xml")]
         print(f"find {len(xml_path_list)} xmls")
         
