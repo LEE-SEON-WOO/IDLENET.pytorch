@@ -99,17 +99,16 @@ if __name__ == '__main__':
                 os.makedirs(os.path.join(root_dir+'/result/saewool1/'+f_name))
 
         for f_name in f_name_list:
-            print(f"Proceeding {f_name_list.index(f_name)+1} file in {len(image_path_list)}")
+            print(f"=====Proceeding {f_name_list.index(f_name)+1} file in {len(image_path_list)}=====")
             path_to_input_image = os.path.join(path_dir+'/color/'+f_name+'.jpg')
             path_to_input_csv = os.path.join(path_dir+'/csv/'+f_name+'.csv')
             path_to_input_xml = os.path.join(path_dir+'/annotation/'+f_name+'.xml')
-            path_to_output_image = os.path.join(os.path.join(root_dir+'/result/saewool1/'+f_name))
-            path_to_output_json = os.path.join(os.path.join(root_dir+'/result/saewool1/'+f_name+'/'+f_name+'.json'))
-            blur_check = args.blur
+            path_to_output = os.path.join(os.path.join(root_dir+'/result/saewool1/'+f_name+'/'+f_name))
+            # blur_check = False
 
-            if blur_check:
-                blur_confidence = blur.run_example(path_to_input_image)
-                
+            # if blur_check:
+            #     blur_confidence = blur.run_example(path_to_input_image)
+            blur_confidence = 1.0
             dataset_name = args.dataset
             backbone_name = args.backbone
             path_to_checkpoint = os.path.join(root_dir+args.checkpoint)
@@ -123,14 +122,12 @@ if __name__ == '__main__':
                                 rpn_pre_nms_top_n=args.rpn_pre_nms_top_n, 
                                 rpn_post_nms_top_n=args.rpn_post_nms_top_n)
 
-            print('Arguments:')
-            print(path_to_output_image)
             for k, v in vars(args).items():
                 print(f'\t{k} = {v}')
             print(Config.describe())
 
-            _infer(path_to_input_image, path_to_output_image, path_to_checkpoint, dataset_name, backbone_name, prob_thresh)
-            analyze_csv.analyze(path_to_input_xml, path_to_input_csv, path_to_output_json, blur_confidence)
+            # _infer(path_to_input_image, path_to_output_image, path_to_checkpoint, dataset_name, backbone_name, prob_thresh)
+            analyze_csv.analyze(path_to_input_xml, path_to_input_csv, path_to_output, blur_confidence, path_to_input_image)
 
     main()
 

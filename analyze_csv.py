@@ -226,7 +226,7 @@ def writeJson2(input_data):
         data["recommend_action"] = "연결부 조임"
     return data
 
-def analyze(xml, csv, out_dir, blur_confidence):
+def analyze(xml, csv, out_dir, blur_confidence, image_path):
     #xml = Annotation file
     fname = os.path.basename(os.path.splitext(xml)[0])
     analyze = parse_xml.parcingXml(xml)
@@ -241,10 +241,15 @@ def analyze(xml, csv, out_dir, blur_confidence):
     file_data["facilities"] = []
 
     for i in range(len(analyze[0])):
+        print(f"process {i+1} in {len(analyze[0])}")
         xmin = int(analyze[0][i])
         xmax = int(analyze[1][i])
         ymin = int(analyze[2][i])
         ymax = int(analyze[3][i])
+        img = cv2.imread(image_path)
+        box_img = cv2.rectangle(img, (xmin,ymin), (xmax,ymax), (0, 255, 0), 2)
+        cv2.imwrite(out_dir+'_'+str(i+1)+'.jpg',box_img)
+
         object_class = analyze[4][i]
         csv_copy = copy.deepcopy(csv_arr)
         csv_crop = csv_copy[ymin:ymax, xmin:xmax]
@@ -263,7 +268,7 @@ def analyze(xml, csv, out_dir, blur_confidence):
         thresh_arr = np.where(csv_crop[:,:]<thresh, 0 ,255)
         thresh_arr = np.array(thresh_arr, dtype=np.uint8)
         hp_contour, _ = cv2.findContours(thresh_arr, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
+        
         # find reflection points
         csv_copy = copy.deepcopy(csv_arr)
         csv_crop = csv_copy[ymin:ymax, xmin:xmax]
@@ -284,12 +289,12 @@ def analyze(xml, csv, out_dir, blur_confidence):
 
         height, width = thresh_arr.shape
         suspected_points = []
-        for i in range(height):
-            for j in range(width):
-                if thresh_arr[i][j] != 0:
-                    temp = calculateMaxSubmission(i, j, csv_crop)
+        for j in range(height):
+            for k in range(width):
+                if thresh_arr[j][k] != 0:
+                    temp = calculateMaxSubmission(j, k, csv_crop)
                     if temp > CRITICAL_GRAD:
-                        suspected_points.append([j,i])
+                        suspected_points.append([k,j])
         
         masking_img = np.zeros((height, width, 3), dtype=np.uint8)
         for pts in suspected_points:
@@ -324,9 +329,9 @@ def analyze(xml, csv, out_dir, blur_confidence):
         file_data["facilities"].append(writeJson2(json_data))
 
         # file_data["facilities"].append(object_data)
-    # with open('./json_rb/'+fname+'.json', 'w', encoding='utf-8') as make_file:
-    with open(out_dir, 'w', encoding='utf-8') as make_file:
-        json.dump(file_data, make_file, indent="\t", ensure_ascii=False)
+        # with open('./json_rb/'+fname+'.json', 'w', encoding='utf-8') as make_file:
+        with open(out_dir+'_'+str(i+1)+'.json', 'w', encoding='utf-8') as make_file:
+            json.dump(file_data, make_file, indent="\t", ensure_ascii=False)
 
 class DiagnosisRule():
     def __init__(self, json_filename):
@@ -354,20 +359,21 @@ class DiagnosisRule():
                 fail_return["Limit Temperature"] = LimitTemp            
         return fail_return
         
-if __name__=="__main__":
-    #example
-    data = os.path.join('D:\\2020연구\\1) 한수원\\2분기\\20.04 우선구현 파일(이노팩토리)\\회전설비')
-    xml_folder_path =  os.path.join(data,'annotations')
-    csv_folder_path = os.path.join(data,'json')
+# if __name__=="__main__":
+#     #example
+#     data = os.path.join('D:\\2020연구\\1) 한수원\\2분기\\20.04 우선구현 파일(이노팩토리)\\회전설비')
+#     xml_folder_path =  os.path.join(data,'annotations')
+#     csv_folder_path = os.print('Arguments:')path.join(data,'json')
     
-    xml_folder = os.listdir(xml_folder_path)
-    csv_folder = os.listdir(csv_folder_path)
+#     xml_folder = os.listdir(xml_folder_path)
+#     csv_folder = os.listdir(csv_folder_path)
     
     
-    out_dir = os.path.join("D:\\2020연구\\1) 한수원\\2분기\\20.04 우선구현 파일(이노팩토리)\\회전설비", "results")
-    for xml, csv in list(zip(xml_folder, csv_folder)):
-        xml_path = os.path.join(xml_folder_path, xml)
-        csv_path = os.path.join(csv_folder_path, csv)
-        print(xml_path, csv_path)
+#     out_dir = os.path.join("D:\\2020연구\\1) 한수원\\2분기\\20.04 우선구현 파일(이노팩토리)\\회전설비", "results")
+#     for xml, csv in list(zip(xml_folder, csv_folder)):
+#         xml_path = os.path.join(xml_folder_path, xml)
+#         csv_path = os.path.join(csv_folder_path, csv)
+#         print(xml_path, csv_path)
 
-        analyze(xml_path, csv_path, out_dir)
+#         analyze(xml_path, csv_path, out_dir)
+
