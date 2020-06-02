@@ -67,44 +67,50 @@ if __name__ == '__main__':
         parser.add_argument('--pooler_mode', type=str, choices=Pooler.OPTIONS, help='default: {.value:s}'.format(Config.POOLER_MODE))
         parser.add_argument('--rpn_pre_nms_top_n', type=int, help='default: {:d}'.format(Config.RPN_PRE_NMS_TOP_N))
         parser.add_argument('--rpn_post_nms_top_n', type=int, help='default: {:d}'.format(Config.RPN_POST_NMS_TOP_N))
-        # parser.add_argument('input', type=str, help='path to input image')
-        # parser.add_argument('output', type=str, help='path to output result image')
-        # parser.add_argument('csv_input', type=str, help='path to input csv')
-        # parser.add_argument('xml_input', type=str, help='path to input xml')
+        parser.add_argument('img_input', type=str, help='path to input image')
+        parser.add_argument('csv_input', type=str, help='path to input csv')
+        parser.add_argument('xml_input', type=str, help='path to input xml')
+        parser.add_argument('output', type=str, help='path to output result image')
         # parser.add_argument('json_result', type=str, help='path to json result')
-        parser.add_argument('data_path', type=str, help='data path')
-        parser.add_argument('blur', type=bool, help='check blur image')
+        # parser.add_argument('data_path', type=str, help='data path')
+        # parser.add_argument('blur', type=bool, help='check blur image')
         args = parser.parse_args()
 
         root_dir = os.path.dirname(os.path.realpath(__file__))
-        path_dir = os.path.join(root_dir + args.data_path)
-
-        image_path = os.path.join(path_dir+'/color')
+        # path_dir = os.path.join(root_dir + args.data_path)
+        path_dir = os.path.abspath(args.img_input)
+        image_path = os.path.join(path_dir,'color')
         image_path_list = [f for f in os.listdir(image_path) if f.endswith(".jpg")]
         print(f"find {len(image_path_list)} images")
 
-        csv_path = os.path.join(path_dir+'/csv')
+        path_dir = os.path.abspath(args.csv_input)
+        csv_path = os.path.join(path_dir,'csv')
         csv_path_list = [f for f in os.listdir(csv_path) if f.endswith(".csv")]
         print(f"find {len(csv_path_list)} Csvs")
 
-        xml_path = os.path.join(path_dir+'/annotation')
+        path_dir = os.path.abspath(args.xml_input)
+        xml_path = os.path.join(path_dir,'annotation')
         xml_path_list = [f for f in os.listdir(xml_path) if f.endswith(".xml")]
         print(f"find {len(xml_path_list)} xmls")
         
+        out_path = os.path.abspath(args.output)
+
         f_name_list = []
-        for image_path in image_path_list:
-            f_name = image_path[:-4]
+        for path in image_path_list:
+            f_name = path[:-4]
             f_name_list.append(f_name)
-            if not os.path.exists(os.path.join(root_dir+'/result/saewool1/'+f_name)):
-                os.makedirs(os.path.join(root_dir+'/result/saewool1/'+f_name))
+            if not os.path.exists(os.path.join(out_path, f_name)):
+                os.makedirs(os.path.join(out_path, f_name))
 
         for f_name in f_name_list:
             print(f"=====Proceeding {f_name_list.index(f_name)+1} file in {len(image_path_list)}=====")
-            path_to_input_image = os.path.join(path_dir+'/color/'+f_name+'.jpg')
-            path_to_input_csv = os.path.join(path_dir+'/csv/'+f_name+'.csv')
-            path_to_input_xml = os.path.join(path_dir+'/annotation/'+f_name+'.xml')
-            path_to_output = os.path.join(os.path.join(root_dir+'/result/saewool1/'+f_name+'/'+f_name))
-            # blur_check = False
+            print(f"img path : {image_path}")
+            print(f"file name : {f_name}")
+            path_to_input_image = os.path.join(image_path, f_name+'.jpg')
+            
+            path_to_input_csv = os.path.join(csv_path, f_name+'.csv')
+            path_to_input_xml = os.path.join(xml_path, f_name+'.xml')
+            path_to_output = os.path.join(out_path, f_name)
 
             # if blur_check:
             #     blur_confidence = blur.run_example(path_to_input_image)

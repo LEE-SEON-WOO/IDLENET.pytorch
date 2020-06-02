@@ -246,6 +246,7 @@ def analyze(xml, csv, out_dir, blur_confidence, image_path):
         xmax = int(analyze[1][i])
         ymin = int(analyze[2][i])
         ymax = int(analyze[3][i])
+
         img = cv2.imread(image_path)
         box_img = cv2.rectangle(img, (xmin,ymin), (xmax,ymax), (0, 255, 0), 2)
         cv2.imwrite(out_dir+'_'+str(i+1)+'.jpg',box_img)
