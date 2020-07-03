@@ -10,3 +10,4 @@ pycocotools
 support/*.pyd
 
 *.so
+paper/*
